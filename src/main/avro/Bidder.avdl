@@ -1,0 +1,74 @@
+/**
+ * A (very) simple real-time bidding protocol for ad exchanges.
+ */
+@namespace("jbaldassari.rtb")
+protocol Bidder {
+
+  /**
+   * Data type representing a creative/slot dimension.
+   */
+  record Dimension {
+    int height;
+    int width;
+  }
+
+  /**
+   * Data type representing a bid request.
+   */
+  record BidRequest {
+    string auctionId;
+    Dimension dimension;
+  }
+
+  /**
+   * Data type representing a bid response.
+   */  
+  record BidResponse {
+    string auctionId;
+    long maxBidMicroCpm;
+    string snippet;
+  }
+
+  /**
+   * An enum containing all valid notification types.
+   */
+  enum NotificationType {
+    WIN,
+    LOSS
+  }
+
+  /**
+   * Data type representing a win/loss notification.
+   * Note that the name of the record is Notification, 
+   * but it is also aliased as WinLossNotification for 
+   * backwards compatibility with an older version of 
+   * the protocol.
+   */
+  @aliases(["jbaldassari.rtb.WinLossNotification"])
+  record Notification {
+    string auctionId;
+    NotificationType notificationType;
+    long winPriceMicroCpm;
+  }
+
+  /**
+   * Contains an error code and optional error message 
+   * that the bidder can return.
+   */
+  error BidderError {
+    int code;
+    union {string, null} message;
+  }
+  
+  /**
+   * Receives a bid request and returns a bid response.
+   */
+  BidResponse bid(BidRequest bidRequest) throws BidderError;
+  
+  /**
+   * Receives a win/loss notification and does not return a 
+   * response (note the 'oneway' keyword and void return type).
+   */
+  void notify(Notification notification) oneway;
+  
+}
