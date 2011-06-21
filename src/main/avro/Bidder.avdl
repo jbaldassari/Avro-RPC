@@ -25,8 +25,8 @@ protocol Bidder {
    */  
   record BidResponse {
     string auctionId;
-    long maxBidMicroCpm;
-    string snippet;
+    long maxBidMicroCpm;  // Max bid in micro-dollars cost per thousand (CPM)
+    string creativeSnippet;  // The creative to display on win
   }
 
   /**
