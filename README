@@ -1,0 +1,16 @@
+This projects depends on one of the following versions of Avro:
+- 1.5.2-SNAPSHOT or later from the 1.5 branch
+- 1.6.0-SNAPSHOT or later from trunk
+
+At the time of writing, none of the required versions have been released, 
+so it is necessary first to check out and build the Avro source.  For example:
+
+$ svn co http://svn.apache.org/repos/asf/avro/branches/branch-1.5 avro-1.5.x
+$ cd avro-1.5.x/lang/java
+$ mvn -DskipTests install
+
+After installing Avro into your local Maven repository, update the Avro 
+dependency in this project, if necessary.  To do so, edit pom.xml, and 
+update the 'avro.version' property to be the version of Avro you just 
+built/installed.
+ 
