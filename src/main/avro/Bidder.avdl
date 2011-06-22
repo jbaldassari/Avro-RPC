@@ -1,74 +1,63 @@
-/**
- * A (very) simple real-time bidding protocol for ad exchanges.
+/*
+ * Copyright 2011 James Baldassari
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
 @namespace("jbaldassari.rtb")
 protocol Bidder {
 
-  /**
-   * Data type representing a creative/slot dimension.
-   */
   record Dimension {
     int height;
     int width;
   }
 
-  /**
-   * Data type representing a bid request.
-   */
   record BidRequest {
     string auctionId;
     Dimension dimension;
   }
 
-  /**
-   * Data type representing a bid response.
-   */  
   record BidResponse {
     string auctionId;
-    long maxBidMicroCpm;  // Max bid in micro-dollars cost per thousand (CPM)
-    string creativeSnippet;  // The creative to display on win
+    long maxBidMicroCpm;
+    union {string, null} creativeSnippet;
   }
 
-  /**
-   * An enum containing all valid notification types.
-   */
+  record AuctionResult {
+    string auctionId;
+    boolean isWon = false;
+    union {string, null} winningBidderId;
+    union {BidResponse, null} winningBid;
+  }
+
   enum NotificationType {
     WIN,
     LOSS
   }
 
-  /**
-   * Data type representing a win/loss notification.
-   * Note that the name of the record is Notification, 
-   * but it is also aliased as WinLossNotification for 
-   * backwards compatibility with an older version of 
-   * the protocol.
-   */
-  @aliases(["jbaldassari.rtb.WinLossNotification"])
   record Notification {
     string auctionId;
     NotificationType notificationType;
     long winPriceMicroCpm;
   }
 
-  /**
-   * Contains an error code and optional error message 
-   * that the bidder can return.
-   */
   error BidderError {
     int code;
     union {string, null} message;
   }
   
-  /**
-   * Receives a bid request and returns a bid response.
-   */
   BidResponse bid(BidRequest bidRequest) throws BidderError;
-  
-  /**
-   * Receives a win/loss notification and does not return a 
-   * response (note the 'oneway' keyword and void return type).
-   */
+
   void notify(Notification notification) oneway;
   
 }

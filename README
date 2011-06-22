@@ -1,4 +1,10 @@
-This projects depends on one of the following versions of Avro:
+Step 1: Install dependencies
+
+* Install Maven if you don't already have it installed.  These examples 
+have been verified to work with Maven 2.0.10, but no other versions of 
+Maven have been tested.
+
+* This projects depends on one of the following versions of Avro:
 - 1.5.2-SNAPSHOT or later from the 1.5 branch
 - 1.6.0-SNAPSHOT or later from trunk
 
@@ -13,4 +19,8 @@ After installing Avro into your local Maven repository, update the Avro
 dependency in this project, if necessary.  To do so, edit pom.xml, and 
 update the 'avro.version' property to be the version of Avro you just 
 built/installed.
- 
+
+Step 2: Build/run examples
+$ git clone git://github.com/jbaldassari/Avro-RPC
+$ cd Avro-RPC
+$ mvn test
