@@ -1,26 +1,40 @@
-Step 1: Install dependencies
-
+*** Step 1: Install dependencies ***
 * Install Maven if you don't already have it installed.  These examples 
-have been verified to work with Maven 2.0.10, but no other versions of 
-Maven have been tested.
+have been verified to work with Maven 2.0.10.  Other versions may work but 
+have not been tested.
 
-* This projects depends on one of the following versions of Avro:
+* The example code depends on one of the following versions of Avro:
 - 1.5.2-SNAPSHOT or later from the 1.5 branch
 - 1.6.0-SNAPSHOT or later from trunk
 
-At the time of writing, none of the required versions have been released, 
-so it is necessary first to check out and build the Avro source.  For example:
+By default the example code will use 1.5.2-SNAPSHOT.  At the time of writing, 
+none of the required versions have been released, so it is necessary first to 
+check out and build the Avro source.  For example:
 
 $ svn co http://svn.apache.org/repos/asf/avro/branches/branch-1.5 avro-1.5.x
 $ cd avro-1.5.x/lang/java
 $ mvn -DskipTests install
 
-After installing Avro into your local Maven repository, update the Avro 
-dependency in this project, if necessary.  To do so, edit pom.xml, and 
-update the 'avro.version' property to be the version of Avro you just 
-built/installed.
+Make note of the specific version of Avro you just installed.  If it is not 
+1.5.2-SNAPSHOT you will need to update the example code's pom.xml file with the 
+version of Avro you installed (see following steps).
 
-Step 2: Build/run examples
+
+*** Step 2: Check out example code ***
 $ git clone git://github.com/jbaldassari/Avro-RPC
 $ cd Avro-RPC
+
+
+*** Step 3: Verify Avro version ***
+If the version of Avro you build/installed in Step 1 is anything other than 
+1.5.2-SNAPSHOT, you will have to update the POM in the example code to point 
+to your version of Avro.  Simply edit pom.xml in the root of the example code 
+checkout, and update the following line with your version of Avro:
+
+<avro.version>1.5.2-SNAPSHOT</avro.version>
+
+
+*** Step 4: Build/run example code ***
+If you are not in the root of the example code (the directory with pom.xml), 
+cd into that directory first.  Then simply run:
 $ mvn test

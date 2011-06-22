@@ -28,7 +28,6 @@ protocol Bidder {
   }
 
   record BidResponse {
-    string auctionId;
     long maxBidMicroCpm;
     union {string, null} creativeSnippet;
   }
@@ -59,5 +58,7 @@ protocol Bidder {
   BidResponse bid(BidRequest bidRequest) throws BidderError;
 
   void notify(Notification notification) oneway;
+  
+  boolean ping(); 
   
 }
