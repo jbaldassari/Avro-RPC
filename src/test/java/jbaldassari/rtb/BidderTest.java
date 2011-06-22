@@ -112,6 +112,19 @@ public class BidderTest {
   }
   
   @Test
+  public void sendSynchronousBidRequest() throws Exception {
+    // Initialize a bidder proxy instance, which connects to the server:
+    Bidder bidder = startServer(new RandomBidder(SNIPPET));
+    
+    // Send bid requests synchronously, waiting for each to return before 
+    // sending the next:
+    for (int ii = 0; ii < NUM_REQUESTS; ii++) {
+      BidResponse bidResponse = bidder.bid(bidRequest);
+      validateBidResponse(bidRequest, bidResponse);
+    }
+  }
+  
+  @Test
   public void sendBidRequestWithCallback() throws Exception {    
     // Initialize a bidder proxy instance, which connects to the server:
     Bidder.Callback bidder = startServer(new RandomBidder(SNIPPET));
@@ -173,17 +186,43 @@ public class BidderTest {
           new ConstantBidder(SNIPPET, constantBid), delayMillis)));
     }
     
+    // Start an auction with a long timeout.
+    // All bidders should respond before the auction ends, so 
+    // the highest bidder (Bidder 10) should win.
+    Auction auction1 = new Auction(bidRequest, bidders, 
+        10, TimeUnit.SECONDS);
+    AuctionResult result1 = auction1.call();
+    if (result1.isWon) {
+      logger.info("Winner is: " + result1.winningBidderId + " with a bid of " + 
+          "$" + (result1.winningBid.maxBidMicroCpm / 1e6) + " CPM.");
+    }
+    else {
+      logger.info("No winners.");
+    }
+    Assert.assertEquals(bidRequest.auctionId, result1.auctionId);
+    Assert.assertTrue(result1.isWon);
+    Assert.assertEquals(new Utf8("Bidder 10"), result1.winningBidderId);
+    validateBidResponse(bidRequest, result1.winningBid);
+    
     // Start an auction with a timeout smaller than the delay configured for 
     // some bidders.
     // With a delay of 580ms, only bidders 1-5 should respond in time.
-    // Bidder 5 should always have the highest bid equal to $0.50 CPM
-    Auction auction = new Auction(bidRequest, bidders, 
+    // Bidder 5 should win because it has the highest bid of the bidders that 
+    // responded before the auction ended.
+    Auction auction2 = new Auction(bidRequest, bidders, 
         580, TimeUnit.MILLISECONDS);
-    AuctionResult result = auction.call();
-    Assert.assertEquals(bidRequest.auctionId, result.auctionId);
-    Assert.assertTrue(result.isWon);
-    Assert.assertEquals(new Utf8("Bidder 5"), result.winningBidderId);
-    validateBidResponse(bidRequest, result.winningBid);
+    AuctionResult result2 = auction2.call();
+    if (result2.isWon) {
+      logger.info("Winner is: " + result2.winningBidderId + " with a bid of " + 
+          "$" + (result2.winningBid.maxBidMicroCpm / 1e6) + " CPM.");
+    }
+    else {
+      logger.info("No winners.");
+    }
+    Assert.assertEquals(bidRequest.auctionId, result2.auctionId);
+    Assert.assertTrue(result2.isWon);
+    Assert.assertEquals(new Utf8("Bidder 5"), result2.winningBidderId);
+    validateBidResponse(bidRequest, result2.winningBid);
     
     // Wait for the rest of the RPCs to complete so that the connections 
     // can be torn down gracefully:
