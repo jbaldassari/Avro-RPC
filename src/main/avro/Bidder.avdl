@@ -14,24 +14,28 @@
  * limitations under the License.
  */
 
+/** A (very) simple real-time bidding protocol */
 @namespace("jbaldassari.rtb")
 protocol Bidder {
-
+  /** The dimension of an ad slot */
   record Dimension {
     int height;
     int width;
   }
 
+  /** Bid request sent from an ad exchange to an auction participant */
   record BidRequest {
     string auctionId;
     Dimension dimension;
   }
 
+  /** Bid response sent from an auction participant back to an ad exchange */
   record BidResponse {
     long maxBidMicroCpm;
     union {string, null} creativeSnippet;
   }
 
+  /** Used by an ad exchange to store the result of an auction */
   record AuctionResult {
     string auctionId;
     boolean isWon = false;
@@ -39,26 +43,32 @@ protocol Bidder {
     union {BidResponse, null} winningBid;
   }
 
+  /** Types of notifications sent from an ad exchange to a bidder */
   enum NotificationType {
     WIN,
     LOSS
   }
 
+  /** Notification sent from an ad exchange to a bidder */
   record Notification {
     string auctionId;
     NotificationType notificationType;
     long winPriceMicroCpm;
   }
 
+  /** An error that may be thrown by a bidder while processing a bid request */
   error BidderError {
     int code;
     union {string, null} message;
   }
   
+  /** Sends a bid request to a bidder and receives the response */
   BidResponse bid(BidRequest bidRequest) throws BidderError;
 
+  /** Sends a notification to a bidder */
   void notify(Notification notification) oneway;
   
+  /** Pings a bidder, e.g. to measure latency */
   boolean ping(); 
   
 }
