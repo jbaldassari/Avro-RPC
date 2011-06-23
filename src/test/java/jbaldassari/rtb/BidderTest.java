@@ -35,7 +35,7 @@ public class BidderTest extends AbstractBidderTest {
   @Test
   public void sendSynchronousBidRequest() throws Exception {
     // Initialize a bidder proxy instance, which connects to the server:
-    Bidder bidder = startServer(new RandomBidder(SNIPPET));
+    Bidder bidder = startServerAndGetClient(new RandomBidder(SNIPPET));
     
     // Send bid requests synchronously, waiting for each to return before 
     // sending the next:
@@ -48,7 +48,7 @@ public class BidderTest extends AbstractBidderTest {
   @Test
   public void sendBidRequestWithCallback() throws Exception {    
     // Initialize a bidder proxy instance, which connects to the server:
-    Bidder.Callback bidder = startServer(new RandomBidder(SNIPPET));
+    Bidder.Callback bidder = startServerAndGetClient(new RandomBidder(SNIPPET));
     
     // Send bid requests, inserting the results asynchronously into a queue:
     final Queue<BidResponse> responses = new LinkedBlockingQueue<BidResponse>();
@@ -78,7 +78,7 @@ public class BidderTest extends AbstractBidderTest {
   @Test
   public void sendBidRequestWithFuture() throws Exception {
     // Initialize a bidder proxy instance, which connects to the server:
-    Bidder.Callback bidder = startServer(new RandomBidder(SNIPPET));
+    Bidder.Callback bidder = startServerAndGetClient(new RandomBidder(SNIPPET));
     
     // Send bid requests, using a CallFuture to wait for each result:
     for (int ii = 0; ii < NUM_REQUESTS; ii++) {

@@ -47,7 +47,7 @@ public class AuctionSimulationTest extends AbstractBidderTest {
       logger.info("Creating bidder " + bidderId + " with constant bid " + 
           constantBid + " micro-dollars CPM and delay of " + 
           delayMillis + "ms");
-      bidders.put(bidderId, startServer(new DelayInjectingBidder(
+      bidders.put(bidderId, startServerAndGetClient(new DelayInjectingBidder(
           new ConstantBidder(SNIPPET, constantBid), delayMillis)));
     }
     

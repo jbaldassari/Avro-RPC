@@ -71,12 +71,13 @@ abstract public class AbstractBidderTest {
   }
 
   /**
-   * Starts a server.
+   * Starts a server, and returns a client for executing RPCs on that server.
    * @param bidder the server-side Bidder implementation to use.
    * @return a Bidder.Callback client to use to communicate with the server.
    * @throws IOException if an error occurs initializing the client.
    */
-  protected Bidder.Callback startServer(Bidder bidder) throws IOException {
+  protected Bidder.Callback startServerAndGetClient(Bidder bidder) throws 
+    IOException {
     // Initialize responder:
     Responder responder = 
       new SpecificResponder(Bidder.class, bidder);
