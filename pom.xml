@@ -30,22 +30,58 @@
     <avro.version>1.5.2-SNAPSHOT</avro.version>
   </properties>
   
+  <!-- These local snapshot repositories are necessary because Avro 1.5.2 
+       has not yet been released.  If this repository were not included 
+       with the example code, it would be necessary to download and install 
+       Avro 1.5.2-SNAPSHOT manually.  After Avro 1.5.2 is released, these 
+       repositories can be removed. -->
+  <repositories>
+    <repository>
+      <id>snapshots</id>
+      <name>Snapshots Repository</name>
+      <url>file:${project.basedir}/lib/snapshots</url>
+      <layout>default</layout>
+      <snapshots>
+        <enabled>true</enabled>
+        <checksumPolicy>ignore</checksumPolicy>
+      </snapshots>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>snapshots</id>
+      <name>Snapshots Repository</name>
+      <url>file:${project.basedir}/lib/snapshots</url>
+      <layout>default</layout>
+      <snapshots>
+        <enabled>true</enabled>
+        <checksumPolicy>ignore</checksumPolicy>
+      </snapshots>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+    </pluginRepository>
+  </pluginRepositories>
+  
   <dependencies>
     <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
       <version>${log4j.version}</version>
     </dependency>
-      <dependency>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-log4j12</artifactId>
-          <version>${slf4j.version}</version>
-      </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>${junit.version}</version>
-    </dependency>    
+    </dependency>
     <dependency>
       <groupId>org.apache.avro</groupId>
       <artifactId>avro</artifactId>

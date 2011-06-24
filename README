@@ -1,6 +1,6 @@
 *** Step 1: Install dependencies ***
 * Install Maven if you don't already have it installed.  These examples 
-have been verified to work with Maven 2.0.10.  Other versions may work but 
+have been verified to work with Maven 2.0.11.  Other versions may work but 
 have not been tested.
 
 * The example code depends on one of the following versions of Avro:
@@ -8,33 +8,16 @@ have not been tested.
 - 1.6.0-SNAPSHOT or later from trunk
 
 By default the example code will use 1.5.2-SNAPSHOT.  At the time of writing, 
-none of the required versions have been released, so it is necessary first to 
-check out and build the Avro source.  For example:
-
-$ svn co http://svn.apache.org/repos/asf/avro/branches/branch-1.5 avro-1.5
-$ cd avro-1.5/lang/java
-$ mvn -DskipTests install
-
-Make note of the specific version of Avro you just installed.  If it is not 
-1.5.2-SNAPSHOT you will need to update the example code's pom.xml file with the 
-version of Avro you installed (see following steps).
+none of the required versions have been released, so I had to include a local 
+Maven repository containing the 1.5.2-SNAPSHOT artifacts in lib/snapshots.  
+Once 1.5.2 or 1.6.0 is released, this local repository can be removed.
 
 
 *** Step 2: Check out example code ***
-$ git clone git://github.com/jbaldassari/Avro-RPC
-$ cd Avro-RPC
+git clone git://github.com/jbaldassari/Avro-RPC
 
 
-*** Step 3: Verify Avro version ***
-If the version of Avro you built/installed in Step 1 is anything other than 
-1.5.2-SNAPSHOT, you will have to update pom.xml in the example code to point 
-to your version of Avro.  Simply edit pom.xml in the root of the example code 
-checkout, and update the following line with your version of Avro:
+*** Step 3: Build/run example code ***
+cd Avro-RPC
+mvn test
 
-<avro.version>1.5.2-SNAPSHOT</avro.version>
-
-
-*** Step 4: Build/run example code ***
-If you are not in the root of the example code (the directory with pom.xml), 
-cd into that directory first.  Then simply run:
-$ mvn test
