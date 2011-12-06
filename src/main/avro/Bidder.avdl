@@ -53,7 +53,7 @@ protocol Bidder {
   record Notification {
     string auctionId;
     NotificationType notificationType;
-    long winPriceMicroCpm;
+    long winPriceMicroCpm = 0;
   }
 
   /** An error that may be thrown by a bidder while processing a bid request */

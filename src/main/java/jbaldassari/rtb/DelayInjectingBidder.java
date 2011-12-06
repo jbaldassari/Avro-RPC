@@ -48,10 +48,8 @@ public class DelayInjectingBidder implements Bidder {
     try {
       Thread.sleep(delayMillis);
     } catch (InterruptedException e) {
-      BidderError error = new BidderError();
-      error.code = -1;
-      error.message = new Utf8("Interrupted while injecting delay");
-      throw error;
+      throw BidderError.newBuilder().setCode(-1).
+        setMessage$(new Utf8("Interrupted while injecting delay")).build();
     }
     return chainedBidder.bid(bidRequest);
   }

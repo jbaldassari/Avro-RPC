@@ -31,7 +31,7 @@ import org.junit.Test;
 public class AuctionSimulationTest extends AbstractBidderTest {
   private static final int NUM_REQUESTS = 10;
   private static final Logger logger = 
-    Logger.getLogger(AuctionSimulationTest.class);
+      Logger.getLogger(AuctionSimulationTest.class);
   
   @Test
   public void runAuction() throws Exception {
@@ -57,17 +57,18 @@ public class AuctionSimulationTest extends AbstractBidderTest {
     Auction auction1 = new Auction(bidRequest, bidders, 
         10, TimeUnit.SECONDS);
     AuctionResult result1 = auction1.call();
-    if (result1.isWon) {
-      logger.info("Winner is: " + result1.winningBidderId + " with a bid of " + 
-          "$" + (result1.winningBid.maxBidMicroCpm / 1e6) + " CPM.");
+    if (result1.getIsWon()) {
+      logger.info("Winner is: " + result1.getWinningBidderId() + 
+          " with a bid of $" + 
+          (result1.getWinningBid().getMaxBidMicroCpm() / 1e6) + " CPM.");
     }
     else {
       logger.info("No winners.");
     }
-    Assert.assertEquals(bidRequest.auctionId, result1.auctionId);
-    Assert.assertTrue(result1.isWon);
-    Assert.assertEquals(new Utf8("Bidder 10"), result1.winningBidderId);
-    validateBidResponse(bidRequest, result1.winningBid);
+    Assert.assertEquals(bidRequest.getAuctionId(), result1.getAuctionId());
+    Assert.assertTrue(result1.getIsWon());
+    Assert.assertEquals(new Utf8("Bidder 10"), result1.getWinningBidderId());
+    validateBidResponse(bidRequest, result1.getWinningBid());
     
     // Start an auction with a timeout smaller than the delay configured for 
     // some bidders.
@@ -77,17 +78,18 @@ public class AuctionSimulationTest extends AbstractBidderTest {
     Auction auction2 = new Auction(bidRequest, bidders, 
         580, TimeUnit.MILLISECONDS);
     AuctionResult result2 = auction2.call();
-    if (result2.isWon) {
-      logger.info("Winner is: " + result2.winningBidderId + " with a bid of " + 
-          "$" + (result2.winningBid.maxBidMicroCpm / 1e6) + " CPM.");
+    if (result2.getIsWon()) {
+      logger.info("Winner is: " + result2.getWinningBidderId() + 
+          " with a bid of $" + 
+          (result2.getWinningBid().getMaxBidMicroCpm() / 1e6) + " CPM.");
     }
     else {
       logger.info("No winners.");
     }
-    Assert.assertEquals(bidRequest.auctionId, result2.auctionId);
-    Assert.assertTrue(result2.isWon);
-    Assert.assertEquals(new Utf8("Bidder 5"), result2.winningBidderId);
-    validateBidResponse(bidRequest, result2.winningBid);
+    Assert.assertEquals(bidRequest.getAuctionId(), result2.getAuctionId());
+    Assert.assertTrue(result2.getIsWon());
+    Assert.assertEquals(new Utf8("Bidder 5"), result2.getWinningBidderId());
+    validateBidResponse(bidRequest, result2.getWinningBid());
     
     // Wait for the rest of the RPCs to complete so that the connections 
     // can be torn down gracefully:

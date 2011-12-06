@@ -52,9 +52,11 @@ public class Auction implements Callable<AuctionResult> {
    * @param timeout amount of time to wait for bids from all participants.
    * @param timeoutUnit unit of the timeout parameter.
    */
-  public Auction(BidRequest bidRequest, 
+  public Auction(
+      BidRequest bidRequest, 
       Map<CharSequence, Bidder.Callback> bidders, 
       long timeout, TimeUnit timeoutUnit) {
+    
     if (bidRequest == null) {
       throw new NullPointerException("bidRequest is null");
     }
@@ -70,6 +72,7 @@ public class Auction implements Callable<AuctionResult> {
     if (timeoutUnit == null) {
       throw new NullPointerException("timeoutUnit is null");
     }
+    
     this.bidRequest = bidRequest;
     this.bidders = bidders;
     this.timeout = timeout;
@@ -84,30 +87,28 @@ public class Auction implements Callable<AuctionResult> {
    * @throws InterruptedException if interrupted while waiting for bids.
    */
   public AuctionResult call() throws IOException, InterruptedException {
-    AuctionResult result = new AuctionResult();
-    result.auctionId = bidRequest.auctionId;
-    result.isWon = false;
+    AuctionResult.Builder result = 
+        AuctionResult.newBuilder().setAuctionId(bidRequest.getAuctionId());
 
     // Create map of bid amount to map of bidder ID to BidResponse
     ConcurrentNavigableMap<Long, ConcurrentMap<CharSequence, BidResponse>> bids 
-      = new ConcurrentSkipListMap<Long, 
-        ConcurrentMap<CharSequence, BidResponse>>();
+      = new ConcurrentSkipListMap<Long, ConcurrentMap<CharSequence, BidResponse>>();
 
     // Send bid requests to all participants:
     for (Map.Entry<CharSequence, Bidder.Callback> entry : bidders.entrySet()) {
       Bidder.Callback bidder = entry.getValue();
-      Callback<BidResponse> callback = 
-        new AuctionCallback(entry.getKey(), bids);
+      Callback<BidResponse> callback = new AuctionCallback(entry.getKey(), bids);
       bidder.bid(bidRequest, callback);
     }
     if (logger.isDebugEnabled()) {
-      logger.debug("All bid requests for auction \"" + bidRequest.auctionId + "\" have been sent.");
+      logger.debug("All bid requests for auction \"" + 
+          bidRequest.getAuctionId() + "\" have been sent.");
     }
 
     // Wait for bidders to bid:
     auctionLatch.await(timeout, timeoutUnit);
     if (logger.isDebugEnabled()) {
-      logger.debug("Auction \"" + bidRequest.auctionId + "\" is over.");
+      logger.debug("Auction \"" + bidRequest.getAuctionId() + "\" is over.");
     }
 
     // Pick the highest non-zero bid:
@@ -136,31 +137,41 @@ public class Auction implements Callable<AuctionResult> {
 
         if (winnerId != null) {
           // Set the appropriate fields in the AuctionResult:
-          result.isWon = true;
-          result.winningBidderId = winnerId;
-          result.winningBid = winningBid;
+          result.setIsWon(true);
+          result.setWinningBidderId(winnerId);
+          result.setWinningBid(winningBid);
 
           // Send win/loss notifications:
           for (Map.Entry<CharSequence, Bidder.Callback> bidder : 
             bidders.entrySet()) {
-            Notification notification = new Notification();
-            notification.auctionId = bidRequest.auctionId;
-            notification.winPriceMicroCpm = result.isWon ? 
-                winningBid.maxBidMicroCpm : 0;
-            if (bidder.getKey().equals(winnerId)) {
-              notification.notificationType = NotificationType.WIN;
+            // Build the notification:
+            Notification.Builder notification = Notification.newBuilder().
+                setAuctionId(bidRequest.getAuctionId()).
+                setNotificationType(NotificationType.LOSS);
+            
+            // Note: Notification has the following default values:
+            // type = LOSS
+            // winPriceMicroCpm = 0
+            
+            if (result.getIsWon()) {
+              // There was a winner in this auction, so set the winning price:
+              notification.setWinPriceMicroCpm(winningBid.getMaxBidMicroCpm());
+              
+              // Was the current bidder the winner?
+              if (bidder.getKey().equals(winnerId)) {
+                notification.setNotificationType(NotificationType.WIN);
+              }
             }
-            else {
-              notification.notificationType = NotificationType.LOSS;
-            }
-            bidder.getValue().notify(notification);
+            
+            // Send the notification to the bidder:
+            bidder.getValue().notify(notification.build());
           }
         }
       }
     }
 
     // Return the auction result:
-    return result;
+    return result.build();
   }
 
   /**
@@ -174,8 +185,7 @@ public class Auction implements Callable<AuctionResult> {
 
     /**
      * Creates an AuctionCallback.
-     * @param bidderId the ID of the bidder associated with this 
-     * AuctionCallback.
+     * @param bidderId the ID of the bidder associated with this AuctionCallback.
      * @param bids map into which the bid response should be inserted.
      */
     public AuctionCallback(CharSequence bidderId, 
@@ -193,7 +203,7 @@ public class Auction implements Callable<AuctionResult> {
     @Override
     public void handleError(Throwable t) {
       logger.error("Bidder " + bidderId + " threw error in auction " + 
-          bidRequest.auctionId, t);
+          bidRequest.getAuctionId(), t);
       auctionLatch.countDown();	// Always count down the latch
     }
 
@@ -206,11 +216,11 @@ public class Auction implements Callable<AuctionResult> {
       }
 
       // Insert the bid into the map:
-      if (!bids.containsKey(bidResponse.maxBidMicroCpm)) {
-        bids.putIfAbsent(bidResponse.maxBidMicroCpm, 
+      if (!bids.containsKey(bidResponse.getMaxBidMicroCpm())) {
+        bids.putIfAbsent(bidResponse.getMaxBidMicroCpm(), 
             new ConcurrentHashMap<CharSequence, BidResponse>(1));
       }
-      bids.get(bidResponse.maxBidMicroCpm).put(bidderId, bidResponse);
+      bids.get(bidResponse.getMaxBidMicroCpm()).put(bidderId, bidResponse);
 
       auctionLatch.countDown();	// Always count down the latch
     }

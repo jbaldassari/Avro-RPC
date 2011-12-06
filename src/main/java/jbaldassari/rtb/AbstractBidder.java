@@ -79,19 +79,19 @@ public abstract class AbstractBidder implements Bidder {
   abstract protected long generateBid();
   
   @Override
-  public BidResponse bid(BidRequest bidRequest) throws AvroRemoteException,
-      BidderError {
-    logger.debug("Bidder " + getBidderId() + 
-        " received request: " + bidRequest);
-    BidResponse bidResponse = new BidResponse();
-    bidResponse.maxBidMicroCpm = generateBid();
+  public BidResponse bid(BidRequest bidRequest) 
+      throws AvroRemoteException, BidderError {
+    logger.debug("Bidder " + getBidderId() + " received request: " + bidRequest);
+    BidResponse.Builder bidResponseBuilder = 
+        BidResponse.newBuilder().setMaxBidMicroCpm(generateBid());
     
-    if (bidResponse.maxBidMicroCpm > 0) {
-      bidResponse.creativeSnippet = getSnippet();
+    // If the bidder decided to bid, set the creative snippet:
+    if (bidResponseBuilder.getMaxBidMicroCpm() > 0) {
+      bidResponseBuilder.setCreativeSnippet(getSnippet());
     }
     
-    logger.debug("Bidder " + getBidderId() + 
-        " sending response: " + bidResponse);
+    BidResponse bidResponse = bidResponseBuilder.build();
+    logger.debug("Bidder " + getBidderId() + " sending response: " + bidResponse);
     return bidResponse;
   }
 

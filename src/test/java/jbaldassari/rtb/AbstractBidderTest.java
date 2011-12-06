@@ -47,12 +47,10 @@ abstract public class AbstractBidderTest {
 
   // Generate a bid request:
   static {
-    bidRequest = new BidRequest();
-    bidRequest.auctionId = new Utf8("Auction 1");
-    Dimension dimension = new Dimension();
-    dimension.width = 480;
-    dimension.height = 60;
-    bidRequest.dimension = dimension;
+    bidRequest = BidRequest.newBuilder().
+        setAuctionId(new Utf8("Auction 1")).
+        setDimension(Dimension.newBuilder().setWidth(480).setHeight(60).build()).
+        build();
   }
 
   @After
@@ -79,8 +77,7 @@ abstract public class AbstractBidderTest {
   protected Bidder.Callback startServerAndGetClient(Bidder bidder) throws 
     IOException {
     // Initialize responder:
-    Responder responder = 
-      new SpecificResponder(Bidder.class, bidder);
+    Responder responder = new SpecificResponder(Bidder.class, bidder);
 
     // Initialize/start server:
     Server server = new NettyServer(responder, new InetSocketAddress(0));
@@ -89,7 +86,7 @@ abstract public class AbstractBidderTest {
 
     // Create the client, and connect to the server:
     Transceiver transceiver = 
-      new NettyTransceiver(new InetSocketAddress(server.getPort()));
+        new NettyTransceiver(new InetSocketAddress(server.getPort()));
     transceivers.add(transceiver);
     Bidder.Callback client = SpecificRequestor.getClient(
         Bidder.Callback.class, transceiver);
@@ -109,11 +106,11 @@ abstract public class AbstractBidderTest {
   protected void validateBidResponse(BidRequest bidRequest, 
       BidResponse bidResponse) {
     Assert.assertNotNull(bidResponse);
-    if (bidResponse.maxBidMicroCpm > 0) {
-      Assert.assertEquals(SNIPPET, bidResponse.creativeSnippet);
+    if (bidResponse.getMaxBidMicroCpm() > 0) {
+      Assert.assertEquals(SNIPPET, bidResponse.getCreativeSnippet());
     }
     else {
-      Assert.assertNull(bidResponse.creativeSnippet);
+      Assert.assertNull(bidResponse.getCreativeSnippet());
     }
   }
 }
