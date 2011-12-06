@@ -30,6 +30,7 @@ import org.junit.Test;
  */
 public class AuctionSimulationTest extends AbstractBidderTest {
   private static final int NUM_REQUESTS = 10;
+  private static final long DELAY_STEP_MILLIS = 100;
   private static final Logger logger = 
       Logger.getLogger(AuctionSimulationTest.class);
   
@@ -37,13 +38,15 @@ public class AuctionSimulationTest extends AbstractBidderTest {
   public void runAuction() throws Exception {
     // Start servers for each participant in the auction
     // Each server will have a specific constant bid and delay associated
-    // with it.
+    // with it equal to the bidder index * DELAY_STEP_MILLIS.
+    // Bidder 0 will have a delay of 0, Bidder 1 will have a delay of 
+    // DELAY_STEP_MILLIS, and so on.
     Map<CharSequence, Bidder.Callback> bidders = 
       new LinkedHashMap<CharSequence, Bidder.Callback>();
     for (int ii = 0; ii < NUM_REQUESTS; ii++) {
       CharSequence bidderId = new Utf8("Bidder " + (ii + 1));
       long constantBid = 100000L * (ii + 1);
-      long delayMillis = 100 * (ii + 1);
+      long delayMillis = DELAY_STEP_MILLIS * (ii + 1);
       logger.info("Creating bidder " + bidderId + " with constant bid " + 
           constantBid + " micro-dollars CPM and delay of " + 
           delayMillis + "ms");
@@ -72,11 +75,11 @@ public class AuctionSimulationTest extends AbstractBidderTest {
     
     // Start an auction with a timeout smaller than the delay configured for 
     // some bidders.
-    // With a delay of 580ms, only bidders 1-5 should respond in time.
+    // With 500ms < delay < 600ms, only bidders 1-5 should respond in time.
     // Bidder 5 should win because it has the highest bid of the bidders that 
     // responded before the auction ended.
     Auction auction2 = new Auction(bidRequest, bidders, 
-        580, TimeUnit.MILLISECONDS);
+        550, TimeUnit.MILLISECONDS);
     AuctionResult result2 = auction2.call();
     if (result2.getIsWon()) {
       logger.info("Winner is: " + result2.getWinningBidderId() + 
