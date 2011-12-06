@@ -1,16 +1,11 @@
 *** Step 1: Install dependencies ***
-* Install Maven if you don't already have it installed.  These examples 
-have been verified to work with Maven 2.0.11.  Other versions may work but 
-have not been tested.
 
-* The example code depends on one of the following versions of Avro:
-- 1.5.2-SNAPSHOT or later from the 1.5 branch
-- 1.6.0-SNAPSHOT or later from trunk
+* Install Maven.  These examples have been verified to work with Maven 2.0.11 
+and 3.0.3.  Other versions may work but have not been tested.
+http://maven.apache.org/download.html
 
-By default the example code will use 1.5.2-SNAPSHOT.  At the time of writing, 
-none of the required versions have been released, so I had to include a local 
-Maven repository containing the 1.5.2-SNAPSHOT artifacts in lib/snapshots.  
-Once 1.5.2 or 1.6.0 is released, this local repository can be removed.
+* Install Git
+http://git-scm.com/download
 
 
 *** Step 2: Check out example code ***
