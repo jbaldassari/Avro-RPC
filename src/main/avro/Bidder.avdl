@@ -59,7 +59,7 @@ protocol Bidder {
   /** An error that may be thrown by a bidder while processing a bid request */
   error BidderError {
     int code;
-    union {string, null} message;
+    union {string, null} description;
   }
   
   /** Sends a bid request to a bidder and receives the response */
